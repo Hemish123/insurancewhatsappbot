@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Renewal Bot</title>
+<meta name="description" content="Renewal Bot Dashboard — manage customers, conversations, and messages in one place.">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #eae6df;
+    color: #111b21;
+    min-height: 100vh;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {44
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.25);
+}
+
+/* ===== KEYFRAMES ===== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 8px rgba(0,168,132,.3); }
+    50%      { box-shadow: 0 0 18px rgba(0,168,132,.55); }
+}
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* ===== HEADER ===== */
+.header {
+    padding: 16px 24px;
+    background: #075e54;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.header::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #25d366;
+    box-shadow: 0 0 8px rgba(37,211,102,.5);
+    animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+/* ===== STAT CARDS ===== */
+.cards {
+    display: flex;
+    gap: 16px;
+    padding: 20px 24px 12px;
+    animation: fadeInUp .5s ease-out both;
+}
+
+.card {
+    flex: 1;
+    background: #ffffff;
+    border: 1px solid #e9edef;
+    padding: 22px 24px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    position: relative;
+    overflow: hidden;
+}
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+.card:nth-child(1)::after {
+    background: linear-gradient(90deg, #25d366, #128c7e);
+}
+.card:nth-child(2)::after {
+    background: linear-gradient(90deg, #00a884, #075e54);
+}
+.card:nth-child(3)::after {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+    border-color: #d1d7db;
+}
+.card:hover::after {
+    opacity: 1;
+}
+
+.card:nth-child(1) { animation: fadeInUp .5s ease-out .1s both; }
+.card:nth-child(2) { animation: fadeInUp .5s ease-out .2s both; }
+.card:nth-child(3) { animation: fadeInUp .5s ease-out .3s both; }
+
+.card > div:first-child {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #8696a0;
+    margin-bottom: 6px;
+}
+
+.card h2 {
+    margin: 8px 0 0;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: #111b21;
+}
+.card:nth-child(1) h2 { color: #075e54; }
+.card:nth-child(2) h2 { color: #00a884; }
+.card:nth-child(3) h2 { color: #e67e00; }
+
+/* ===== MAIN LAYOUT ===== */
+.main {
+    display: flex;
+    height: 68vh;
+    margin: 12px 24px 24px;
+    background: #ffffff;
+    border: 1px solid #e0e5e8;
+    border-radius: 12px;
+    overflow: hidden;
+    animation: fadeInUp .5s ease-out .35s both;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* ===== LEFT SIDEBAR / TABLE ===== */
+.sidebar {
+    width: 38%;
+    border-right: 1px solid #e9edef;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+th {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e9edef;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8696a0;
+    background: #f0f2f5;
+}
+
+td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f2f5;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #54656f;
+    transition: color .2s ease, background .2s ease;
+}
+
+tr {
+    transition: background .2s ease;
+}
+tbody tr:hover {
+    background: #f0f7f4;
+}
+tbody tr:hover td {
+    color: #111b21;
+}
+
+td.phone {
+    color: #027eb5;
+    cursor: pointer;
+    font-weight: 600;
+    position: relative;
+    transition: color .2s ease;
+}
+td.phone:hover {
+    color: #00a884;
+}
+td.phone::before {
+    content: '📞';
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+/* ===== RIGHT CHAT PANEL ===== */
+.chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #efeae2;
+    position: relative;
+}
+.chat::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.35;
+    background-image:
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8b89a' fill-opacity='0.25'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+/* Chat Header */
+.chat-header {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: #075e54;
+    color: #ffffff;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.chat-header.show {
+    display: flex;
+}
+.chat-header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.chat-header-info {
+    flex: 1;
+}
+.chat-header-phone {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+.chat-header-status {
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.7);
+    margin-top: 1px;
+}
+
+/* Selected row highlight */
+tr.selected-row {
+    background: #e7f8f0 !important;
+}
+tr.selected-row td {
+    color: #075e54 !important;
+}
+tr.selected-row td.phone {
+    color: #00a884 !important;
+}
+
+.messages {
+    flex: 1;
+    padding: 20px 60px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+}
+
+.msg {
+    margin: 2px 0;
+    padding: 8px 14px 10px;
+    border-radius: 8px;
+    max-width: 62%;
+    font-size: 13.5px;
+    line-height: 1.5;
+    font-weight: 400;
+    animation: fadeInUp .25s ease-out both;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.user-msg {
+    background: #d9fdd3;
+    color: #111b21;
+    margin-left: auto;
+    border-top-right-radius: 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+.bot-msg {
+    background: #ffffff;
+    border: none;
+    color: #111b21;
+    border-top-left-radius: 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* ===== INPUT AREA ===== */
+.input {
+    display: flex;
+    border-top: 1px solid #e9edef;
+    background: #f0f2f5;
+}
+
+input {
+    flex: 1;
+    padding: 14px 18px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #111b21;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+}
+input::placeholder {
+    color: #8696a0;
+}
+
+button {
+    padding: 14px 24px;
+    background: #00a884;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+button:hover {
+    background: #008f72;
+    transform: scale(1.02);
+    box-shadow: 0 4px 14px rgba(0,168,132,.25);
+}
+button:active {
+    transform: scale(.97);
+}
+
+/* ===== EMPTY STATE ===== */
+.messages:empty::after {
+    content: 'Select a customer to view messages';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #8696a0;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    .cards {
+        flex-direction: column;
+        padding: 16px 12px 8px;
+    }
+    .main {
+        flex-direction: column;
+        height: auto;
+        margin: 10px 12px 20px;
+    }
+    .sidebar {
+        width: 100%;
+        max-height: 40vh;
+        border-right: none;
+        border-bottom: 1px solid #e9edef;
+    }
+    .chat {
+        min-height: 50vh;
+    }
+    .header {
+        padding: 14px 14px;
+        font-size: 17px;
+    }
+    .messages {
+        padding: 16px 16px;
+    }
+}
+
+/* ===== HEADER NAV BUTTONS ===== */
+.header .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.header .nav-btn {
+    padding: 8px 18px;
+    background: rgba(255,255,255,0.15);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.header .nav-btn:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.4);
+    transform: translateY(-1px);
+}
+.header .nav-btn.active {
+    background: rgba(37,211,102,0.25);
+    border-color: #25d366;
+}
+
+@media (max-width: 600px) {
+    .header .nav-btn span.btn-label {
+        display: none;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <span>Dashboard</span>
+    <div class="nav-right">
+        <a href="/bot/upload-page/" class="nav-btn">
+            <span>📁</span>
+            <span class="btn-label">Upload File</span>
+        </a>
+    </div>
+</div>
+
+<!-- STATS -->
+<div class="cards">
+    <div class="card">
+        <div>Total Customers</div>
+        <h2 id="totalCustomers">0</h2>
+    </div>
+
+    <div class="card">
+        <div>Total Conversations</div>
+        <h2 id="totalConversations">0</h2>
+    </div>
+
+    <div class="card">
+        <div>Total Messages</div>
+        <h2 id="totalMessages">0</h2>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- LEFT TABLE -->
+    <div class="sidebar">
+        <table>
+            <thead>
+                <tr>
+                    <th>Phone</th>
+                    <th>First Contact</th>
+                    <th>Recent Contact</th>
+                </tr>
+            </thead>
+            <tbody id="customerTable"></tbody>
+        </table>
+    </div>
+
+    <!-- RIGHT CHAT -->
+    <div class="chat">
+        <div class="chat-header" id="chatHeader">
+            <div class="chat-header-avatar">👤</div>
+            <div class="chat-header-info">
+                <div class="chat-header-phone" id="chatHeaderPhone"></div>
+                <div class="chat-header-status">Customer</div>
+            </div>
+        </div>
+        <div class="messages" id="messages"></div>
+    </div>
+
+</div>
+
+<script>
+
+let selectedUser = null;
+
+/* LOAD DASHBOARD */
+async function loadDashboard() {
+
+    const res = await fetch("/bot/dashboard/data/");
+    const data = await res.json();
+
+    // stats
+    document.getElementById("totalCustomers").innerText = data.total_customers;
+    document.getElementById("totalMessages").innerText = data.total_messages;
+    document.getElementById("totalConversations").innerText = data.total_conversations;
+
+    const table = document.getElementById("customerTable");
+    table.innerHTML = "";
+
+    data.customers.forEach(c => {
+
+        const row = `
+            <tr data-user-id="${c.id}" data-phone="+${c.phone}">
+                <td class="phone" onclick="openChat(${c.id}, this)">+${c.phone}</td>
+                <td>${formatDate(c.first_contact)}</td>
+                <td>${formatDate(c.last_contact)}</td>
+            </tr>
+        `;
+
+        table.innerHTML += row;
+    });
+}
+
+/* FORMAT DATE */
+function formatDate(dateStr) {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    return d.toDateString();
+}
+
+/* OPEN CHAT */
+async function openChat(userId, tdEl) {
+
+    if (!userId) {
+        alert("User ID missing");
+        return;
+    }
+
+    selectedUser = userId;
+
+    // Highlight selected row
+    document.querySelectorAll('#customerTable tr.selected-row').forEach(r => r.classList.remove('selected-row'));
+    if (tdEl) {
+        const row = tdEl.closest('tr');
+        row.classList.add('selected-row');
+
+        // Show chat header with phone
+        const phone = row.getAttribute('data-phone');
+        document.getElementById('chatHeaderPhone').textContent = phone;
+        document.getElementById('chatHeader').classList.add('show');
+    }
+
+    const res = await fetch(`/bot/dashboard/messages/${userId}/`);
+    const data = await res.json();
+
+    const box = document.getElementById("messages");
+    box.innerHTML = "";
+
+    data.messages.forEach(m => {
+
+        const div = document.createElement("div");
+        div.className = "msg " + (m.sender === "user" ? "user-msg" : "bot-msg");
+        div.innerText = m.message;
+
+        box.appendChild(div);
+    });
+}
+
+/* SEND MESSAGE */
+async function sendMessage() {
+
+    const input = document.getElementById("msgInput");
+    const text = input.value;
+
+    if (!text || !selectedUser) return;
+
+    await fetch("/bot/dashboard/send/", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            customer_id: selectedUser,
+            message: text
+        })
+    });
+
+    input.value = "";
+    openChat(selectedUser);
+}
+
+
+
+/* INIT */
+window.onload = loadDashboard;
+
+</script>
+
+</body>
+</html>

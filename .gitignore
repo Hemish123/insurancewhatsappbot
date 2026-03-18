@@ -1,0 +1,57 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# Virtual Environment
+# =========================
+venv/
+env/
+ENV/
+
+# =========================
+# Django
+# =========================
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# =========================
+# Environment Variables (IMPORTANT 🔐)
+# =========================
+.env
+
+# =========================
+# VS Code / IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Node (if used later)
+# =========================
+node_modules/
+
+# =========================
+# Temporary Files
+# =========================
+*.swp
+*.tmp
+
+.env
+venv/
+__pycache__/
+db.sqlite3
+media/
+*.pyc
