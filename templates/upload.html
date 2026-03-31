@@ -154,6 +154,35 @@ body {
     font-weight: 600;
     letter-spacing: 0.3px;
 }
+.loading-progress {
+    color: rgba(255,255,255,0.85);
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    display: none;
+}
+.loading-progress.show {
+    display: block;
+}
+.progress-bar-wrapper {
+    width: 260px;
+    height: 6px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+    display: none;
+}
+.progress-bar-wrapper.show {
+    display: block;
+}
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #25d366, #00a884);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
 
 /* ===== TOAST ALERT ===== */
 .toast-alert {
@@ -470,6 +499,26 @@ body {
 .upload-btn:active {
     transform: scale(0.97);
 }
+.upload-btn.uploading {
+    background: #6b7a80;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+    transform: none;
+}
+.upload-btn.uploading .btn-spinner {
+    display: inline-block;
+}
+.btn-spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
 
 /* Back link */
 .back-link {
@@ -528,11 +577,16 @@ body {
 
 .excel-table-wrapper {
     border-radius: 10px;
-    overflow: hidden;
+    overflow-x: auto;
     border: 1px solid #e0e5e8;
 }
+.excel-table-wrapper::-webkit-scrollbar { height: 4px; }
+.excel-table-wrapper::-webkit-scrollbar-track { background: #f0f2f5; border-radius: 2px; }
+.excel-table-wrapper::-webkit-scrollbar-thumb { background: #c4ccd5; border-radius: 2px; }
+.excel-table-wrapper::-webkit-scrollbar-thumb:hover { background: #8696a0; }
 
 .excel-table {
+    min-width: 820px;
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
@@ -640,6 +694,10 @@ body {
 <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
     <div class="loading-text">Uploading file…</div>
+    <div class="loading-progress" id="loadingProgress">Preparing messages…</div>
+    <div class="progress-bar-wrapper" id="progressBarWrapper">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
 </div>
 
 <!-- HEADER / NAVBAR -->
@@ -706,8 +764,10 @@ body {
                 <button class="file-info-remove" onclick="removeFile()" title="Remove file">✕</button>
             </div>
 
-            <button class="upload-btn" onclick="uploadFile()">
-                <span>⬆️</span> Upload & Send Messages
+            <button class="upload-btn" id="uploadBtn" onclick="uploadFile()">
+                <span class="btn-spinner"></span>
+                <span class="btn-icon">⬆️</span>
+                <span class="btn-text">Upload & Send Messages</span>
             </button>
 
             <a href="/bot/dashboard/" class="back-link">← Back to Dashboard</a>
@@ -728,65 +788,91 @@ body {
                             <th>phone</th>
                             <th>policy_number</th>
                             <th>policy_expiry</th>
+                            <th>vehicle_type</th>
+                            <th>vehicle_number</th>
+                            <th>customer_type</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Jhonn</td>
-                            <td>9198763XXXX</td>
+                            <td>John</td>
+                            <td>9198765XXXXX</td>
                             <td>POL1001</td>
-                            <td>21-03-2026</td>
-                        </tr>
-
-                        <tr>
-                            <td>Selly</td>
-                            <td>9198765XXXX</td>
-                            <td>POL1001</td>
-                            <td>21-03-2026</td>
-                        </tr>
-
-                        <tr>
-                            <td>Rony</td>
-                            <td>9198765XXXX</td>
-                            <td>POL1001</td>
-                            <td>21-03-2026</td>
+                            <td>28-03-2026</td>
+                            <td>Car</td>
+                            <td>GJ01AB1234</td>
+                            <td>renewal</td>
                         </tr>
                         <tr>
-                            <td>Tom</td>
-                            <td>9198765XXXX</td>
-                            <td>POL1001</td>
-                            <td>21-03-2026</td>
-                        </tr>
-                        <tr>
-                            <td>jerry</td>
-                            <td>9198765XXXX</td>
-                            <td>POL1001</td>
-                            <td>21-03-2026</td>
-                        </tr>
-                        <tr>
-                            <td>Lessa</td>
-                            <td>9198765XXXX</td>
-                            <td>POL1001</td>
-                            <td>21-03-2026</td>
-                        </tr>
-                        <tr>
-                            <td>Rubby</td>
-                            <td>9198765XXXX</td>
-                            <td>POL1001</td>
-                            <td>21-03-2026</td>
-                        </tr>
-                        
-                        <tr>
-                            <td>Tonny</td>
+                            <td>Sara</td>
                             <td>9191234XXXXX</td>
-                            <td>POL1002</td>
-                            <td>25-03-2026</td>
+                            <td>POL1003</td>
+                            <td>26-03-2026</td>
+                            <td>Bike</td>
+                            <td>GJ05CD5678</td>
+                            <td>renewal</td>
                         </tr>
                         <tr>
-                            <td>Alice</td>
+                            <td>Tony</td>
                             <td>9187654XXXXX</td>
                             <td>POL1003</td>
-                            <td>30-03-2026</td>
+                            <td>27-03-2026</td>
+                            <td>Car</td>
+                            <td>GJ05CD5670</td>
+                            <td>New</td>
+                        </tr>
+                        <tr>                        
+                            <td>Elley</td>
+                            <td>9187654XXXXX</td>
+                            <td>POL1003</td>
+                            <td>27-03-2026</td>
+                            <td>Car</td>
+                            <td>GJ05CD5670</td>
+                            <td>New</td>
+                        </tr>
+                        <tr>                        
+                            <td>Hulk</td>
+                            <td>9187654XXXXX</td>
+                            <td>POL1003</td>
+                            <td>27-03-2026</td>
+                            <td>Car</td>
+                            <td>GJ05CD5670</td>
+                            <td>New</td>
+                        </tr>                        
+                            <td>Locky</td>
+                            <td>9187654XXXXX</td>
+                            <td>POL1003</td>
+                            <td>27-03-2026</td>
+                            <td>Car</td>
+                            <td>GJ05CD5670</td>
+                            <td>New</td>
+                        </tr>
+                        <tr>                                                
+                            <td>Lussy</td>
+                            <td>9187654XXXXX</td>
+                            <td>POL1003</td>
+                            <td>27-03-2026</td>
+                            <td>Car</td>
+                            <td>GJ05CD5670</td>
+                            <td>New</td>
+                        </tr> 
+                        <tr>                                              
+                            <td>Elisa</td>
+                            <td>9187654XXXXX</td>
+                            <td>POL1003</td>
+                            <td>27-03-2026</td>
+                            <td>Car</td>
+                            <td>GJ05CD5670</td>
+                            <td>New</td>
+                        </tr>
+                        <tr>                                              
+                            <td>Tom</td>
+                            <td>9187654XXXXX</td>
+                            <td>POL1003</td>
+                            <td>27-03-2026</td>
+                            <td>Car</td>
+                            <td>GJ05CD5670</td>
+                            <td>New</td>
                         </tr>
                     </tbody>
                 </table>
@@ -887,6 +973,42 @@ function dismissToast(btn) {
 }
 
 /* UPLOAD */
+let progressInterval = null;
+
+function startProgressPolling() {
+    const progressEl = document.getElementById('loadingProgress');
+    const barWrapper = document.getElementById('progressBarWrapper');
+    const barFill = document.getElementById('progressBarFill');
+
+    progressEl.classList.add('show');
+    barWrapper.classList.add('show');
+    progressEl.textContent = 'Preparing messages\u2026';
+    barFill.style.width = '0%';
+
+    progressInterval = setInterval(async () => {
+        try {
+            const res = await fetch('/bot/upload/progress/');
+            const data = await res.json();
+            if (data.active && data.total > 0) {
+                progressEl.textContent = `Sending ${data.sent}/${data.total} messages\u2026`;
+                const pct = Math.round((data.sent / data.total) * 100);
+                barFill.style.width = pct + '%';
+            }
+        } catch (e) {}
+    }, 1000);
+}
+
+function stopProgressPolling() {
+    if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+    }
+    const progressEl = document.getElementById('loadingProgress');
+    const barWrapper = document.getElementById('progressBarWrapper');
+    progressEl.classList.remove('show');
+    barWrapper.classList.remove('show');
+}
+
 async function uploadFile() {
 
     const file = fileInput.files[0];
@@ -898,6 +1020,15 @@ async function uploadFile() {
 
     const overlay = document.getElementById('loadingOverlay');
     overlay.classList.add('active');
+
+    // Show inline progress on the button
+    const btn = document.getElementById('uploadBtn');
+    btn.classList.add('uploading');
+    btn.querySelector('.btn-icon').style.display = 'none';
+    btn.querySelector('.btn-text').textContent = 'Uploading\u2026';
+
+    // Start polling progress
+    startProgressPolling();
 
     try {
         const formData = new FormData();
@@ -921,7 +1052,13 @@ async function uploadFile() {
     } catch (err) {
         showToast('Upload failed. Please try again.', 'warning');
     } finally {
+        stopProgressPolling();
         overlay.classList.remove('active');
+
+        // Reset button state
+        btn.classList.remove('uploading');
+        btn.querySelector('.btn-icon').style.display = '';
+        btn.querySelector('.btn-text').textContent = 'Upload & Send Messages';
     }
 }
 
